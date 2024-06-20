@@ -1,17 +1,33 @@
-pipeline {
-    agent { label 'nodejs' }
-
-    // Set your OCP project
-    environment { APP_NAMESPACE = '...' }
-
+pipeline{
+    agent{
+        label "nodejs"
+    }
     stages{
-
-        stage('Test'){
-            steps {
-                sh "node test.js"
+        stage("Install dependencies"){
+            steps{
+                sh "npm ci"
             }
         }
 
-        // Add more stages here
+        stage("Check Style"){
+            steps{
+                sh "npm run lint"
+            }
+        }
+
+        stage("Test"){
+            steps{
+                sh "npm test"
+            }
+        }
+
+        stage('Release') {
+            steps {
+                sh '''
+                    oc project gsvdhs-greetings
+                    oc start-build greeting-console  --follow --wait
+                '''
+            }
+        }
     }
 }

@@ -1,7 +1,11 @@
 FROM registry.access.redhat.com/ubi8/nodejs-12
 
-# Copy app
-COPY . .
+# Install dependencies
+COPY package.json package-lock.json /app/
+WORKDIR /app
+RUN npm ci --production
 
-EXPOSE 3000
-ENTRYPOINT [ "node", "server" ]
+# Copy app
+COPY . /app
+
+ENTRYPOINT [ "node", "index" ]
